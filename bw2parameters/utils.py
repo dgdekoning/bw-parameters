@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import ast
+
 import asteval
 
 try:
@@ -13,6 +15,7 @@ def _get_existing_symbols():
     interpreter = asteval.Interpreter()
     return set(interpreter.symtable)
 
+
 EXISTING_SYMBOLS = _get_existing_symbols()
 
 
@@ -24,9 +27,10 @@ def get_symbols(expression):
 
 
 def isidentifier(ident):
-    """Determines, if string is valid Python identifier.
+    """ Determines if given string is valid Python identifier.
 
-    Stolen from http://stackoverflow.com/questions/12700893/how-to-check-if-a-string-is-a-valid-python-identifier-including-keyword-check"""
+    Stolen from http://stackoverflow.com/questions/12700893/how-to-check-if-a-string-is-a-valid-python-identifier-including-keyword-check
+    """
 
     if not isinstance(ident, string_type):
         raise TypeError('expected str, but got {!r}'.format(type(ident)))

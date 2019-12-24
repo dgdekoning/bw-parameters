@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 import ast
+from copy import deepcopy
+
 from asteval.astutils import FROM_MATH, FROM_PY, FROM_NUMPY, NUMPY_RENAMES, NameFinder
 from astunparse import unparse
-from copy import deepcopy
+
 
 BUILTINS = FROM_MATH + FROM_NUMPY + FROM_PY + tuple(NUMPY_RENAMES.keys())
 

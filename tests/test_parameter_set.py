@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import sys
+
+import numpy as np
+import pytest
+
 from bw2parameters import ParameterSet
 from bw2parameters.errors import (
     CapitalizationError,
@@ -7,9 +12,6 @@ from bw2parameters.errors import (
     SelfReference,
 )
 from bw2parameters.utils import get_symbols, isidentifier
-import numpy as np
-import pytest
-import sys
 
 
 def test_call_updates_exchanges():
@@ -30,6 +32,7 @@ def test_call_updates_exchanges():
     assert ds['exchanges'][0] == {'amount': 10, 'formula': 'Elders_of_Krikkit'}
     assert ds['exchanges'][1] == {'amount': 44}
 
+
 def test_call_no_exchanges():
     ds = {
         'parameters': {
@@ -41,9 +44,11 @@ def test_call_no_exchanges():
     ds = ParameterSet(ds['parameters'])(ds)
     assert 'exchanges' not in ds
 
+
 def test_find_symbols():
     assert {'a', 'b', 'c'} == get_symbols('a * b + c')
     assert {'a', 'b', 'c'} == get_symbols('a * 4 + 2.4 + sqrt(b) + log(a * c)')
+
 
 def test_isidentifier():
     assert isidentifier('foo')
@@ -69,6 +74,7 @@ def test_isidentifier():
     with pytest.raises(TypeError):
         isidentifier(3)
 
+
 def test_simple_evaluation():
     params = {
         'Agrajag': {'amount': 3.14},
@@ -90,6 +96,7 @@ def test_simple_evaluation():
     }
     ParameterSet(params).evaluate()
 
+
 def test_evaluation_values():
     params = {
         'Deep_Thought': {'amount': 42},
@@ -98,6 +105,7 @@ def test_evaluation_values():
     }
     ps = ParameterSet(params)
     assert ps.evaluate() == {'Deep_Thought': 42, 'Elders_of_Krikkit': 10, 'East_River_Creature': 100}
+
 
 def test_evaluate_update_values():
     params = {
@@ -109,9 +117,11 @@ def test_evaluate_update_values():
     assert params['East_River_Creature']['amount'] ==  100
     assert params['Elders_of_Krikkit']['amount'] ==  10
 
+
 def test_not_dict():
     with pytest.raises(ValueError):
         ps = ParameterSet([])
+
 
 def test_missing_fields():
     with pytest.raises(ValueError):
@@ -127,26 +137,32 @@ def test_missing_fields():
             {'name': 'Constant_Mown'}
         ])
 
+
 def test_not_dict():
     with pytest.raises(ValueError):
         ps = ParameterSet({'Deep Thought': 42})
+
 
 def test_space_in_name():
     ps = ParameterSet({'Deep_Thought': {'amount': 42}})
     with pytest.raises(ValueError):
         ps = ParameterSet({'Deep Thought': {'amount': 42}})
 
+
 def test_name_in_existing_symbols():
     with pytest.raises(DuplicateName):
         ps = ParameterSet({'log': {'amount': 1}})
+
 
 def test_self_reference():
     with pytest.raises(SelfReference):
         ParameterSet({'Elders_of_Krikkit': {'formula': '2 * Elders_of_Krikkit'}})
 
+
 def test_missing_reference():
     with pytest.raises(ParameterError):
         ps = ParameterSet({'Elders_of_Krikkit': {'formula': '2 * Ford_Prefect'}})
+
 
 def test_circular_reference():
     with pytest.raises(ParameterError):
@@ -156,12 +172,14 @@ def test_circular_reference():
             'Agrajag': {'formula': '2 * East_River_Creature'},
         })
 
+
 def test_capitaliation_error():
     with pytest.raises(CapitalizationError):
         ps = ParameterSet({
             'Elders_of_Krikkit': {'formula': '2 * Agrajag'},
             'agrajag': {'amount': 2},
         })
+
 
 def test_non_numeric():
     with pytest.raises(ValueError):
@@ -170,11 +188,13 @@ def test_non_numeric():
             'Elders_of_Krikkit': {'formula': 'sqrt(East_River_Creature)'},
         }, {'Deep Thought': 'Thought'})
 
+
 def test_local_params_arrays_allowed():
     ps = ParameterSet({
         'East_River_Creature': {'formula': '2 * Deep_Thought + 16'},
         'Elders_of_Krikkit': {'amount': np.arange(5)},
     }, {'Deep_Thought': 5})
+
 
 def test_global_params_arrays_allowed():
     ps = ParameterSet({
@@ -182,12 +202,14 @@ def test_global_params_arrays_allowed():
         'Elders_of_Krikkit': {'formula': 'sqrt(East_River_Creature)'},
     }, {'Deep_Thought': np.arange(5)})
 
+
 def test_nonidentifier():
     with pytest.raises(ValueError):
         ps = ParameterSet({
             'East_River_Creature': {'formula': '2 * Deep_Thought + 16'},
             'Elders_of_Krikkit': {'formula': 'sqrt(East_River_Creature)'},
         }, {'Deep Thought': 2.4})
+
 
 def test_evaluate():
     ps = ParameterSet({

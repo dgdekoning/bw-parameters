@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class ValidationError(Exception):
     """Base class for errors with variables and formulas"""
     pass

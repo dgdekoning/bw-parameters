@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from .errors import *
-from .utils import get_symbols, EXISTING_SYMBOLS, isstr, isidentifier
-from asteval import Interpreter
 from numbers import Number
 from pprint import pformat
-from stats_arrays import uncertainty_choices
+
+from asteval import Interpreter
 import numpy as np
+from stats_arrays import uncertainty_choices
+
+from .errors import *
+from .utils import get_symbols, EXISTING_SYMBOLS, isstr, isidentifier
+
 
 MC_ERROR_TEXT = """Formula returned array of wrong shape:
 Name: {}
@@ -29,7 +32,8 @@ class ParameterSet(object):
         self.order = self.get_order()
 
     def get_order(self):
-        """Get a list of parameter name in an order that they can be safely evaluated"""
+        """ Get a list of parameter name in an order that they can be safely evaluated.
+        """
         order = []
         seen = set()
         refs = self.references.copy()
@@ -66,7 +70,8 @@ class ParameterSet(object):
         return order
 
     def get_references(self):
-        """Create dictionary of parameter references"""
+        """ Create dictionary of parameter references.
+        """
         refs = {key: get_symbols(value['formula'])
                 if value.get('formula') else set()
                 for key, value in self.params.items()}
@@ -74,7 +79,8 @@ class ParameterSet(object):
         return refs
 
     def basic_validation(self):
-        """Basic validation needed to build ``references`` and ``order``"""
+        """ Basic validation needed to build ``references`` and ``order``.
+        """
         if not isinstance(self.params, dict):
             raise ValueError(u"Parameters are not a dictionary")
         if not isinstance(self.global_params, dict):
@@ -103,7 +109,8 @@ class ParameterSet(object):
                                   u"Python name").format(key))
 
     def evaluate(self):
-        """Evaluate each formula. Returns dictionary of parameter names and values."""
+        """ Evaluate each formula. Returns dictionary of parameter names and values.
+        """
         interpreter = Interpreter()
         result = {}
         for key in self.order:
@@ -120,18 +127,20 @@ class ParameterSet(object):
         return result
 
     def evaluate_and_set_amount_field(self):
-        """Evaluate each formula. Updates the ``amount`` field of each parameter."""
+        """ Evaluate each formula. Updates the ``amount`` field of each parameter.
+        """
         result = self.evaluate()
         for key, value in self.params.items():
             value[u'amount'] = result[key]
         return result
 
     def evaluate_monte_carlo(self, iterations=1000):
-        """Evaluate each formula using Monte Carlo and variable uncertainty data, if present.
+        """ Evaluate each formula using Monte Carlo and variable uncertainty data, if present.
 
         Formulas **must** return a one-dimensional array, or ``BroadcastingError`` is raised.
 
-        Returns dictionary of ``{parameter name: numpy array}``."""
+        Returns dictionary of ``{parameter name: numpy array}``.
+        """
         interpreter = Interpreter()
         result = {}
 
@@ -170,7 +179,8 @@ class ParameterSet(object):
         return result
 
     def __call__(self, ds=None):
-        """Evaluate each formula, and update ``exchanges`` if they reference a ``parameter`` name."""
+        """ Evaluate each formula, and update ``exchanges`` if they reference a ``parameter`` name.
+        """
         if ds is None:
             return self.evaluate_and_set_amount_field()
 
@@ -186,7 +196,10 @@ class ParameterSet(object):
         return ds
 
     def get_interpreter(self, evaluate_first=True):
-        """Get an instance of ``asteval.Interpreter`` that is prepopulated with global and local symbol names and values."""
+        """ Get a prepopulated instance of ``asteval.Interpreter``
+
+        Global and local symbol names and values have been included.
+        """
         if evaluate_first:
             self.evaluate_and_set_amount_field()
 

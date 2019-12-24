@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bw2parameters import *
 
 
@@ -5,6 +6,7 @@ def test_mangle_formula():
     given = "log(foo * bar) + 7 / baz"
     prefix = "pre"
     assert mangle_formula(given, prefix, ['bar']) == '(log((pre__foo * bar)) + (7 / pre__baz))'
+
 
 def test_prefix_parameter_dict():
     given = {
@@ -19,6 +21,7 @@ def test_prefix_parameter_dict():
     }
     substitutions = {'a': 't_a', 'b': 't_b', 'catch': 't_catch'}
     assert prefix_parameter_dict(given, "t_") == (expected, substitutions)
+
 
 def test_chain_prefix_parameter_dict():
     given = {'a': {'formula': 'a + b / c'}}
