@@ -1,0 +1,30 @@
+package:
+  name: "{{ os.environ.get('PKG_NAME', 'bw-parameters-dev') }}"
+  version: "{{ os.environ.get('VERSION', 'dev') }}"
+
+source:
+  path: ../..
+
+build:
+  noarch: python
+  number: 0
+  script: python setup.py install --single-version-externally-managed --record record.txt
+
+requirements:
+  build:
+    - python
+    - setuptools
+  run:
+    - asteval
+    - astunparse
+    - numpy
+    - python
+    - stats_arrays
+
+about:
+  home: https://github.com/dgdekoning/bw-parameters
+  license: BSD 2-Clause
+  license_file: LICENSE
+  summary: 'Library for storing, validating, and calculating with parameters. Designed to work with the Brightway life cycle assessment framework.'
+  license_family: BSD
+  dev_url: https://github.com/dgdekoning/bw-parameters

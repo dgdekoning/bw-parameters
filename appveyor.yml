@@ -5,10 +5,6 @@ environment:
   PYTHONIOENCODING: "UTF-8"
 
   matrix:
-    - PYTHON_VERSION: "2.7"
-      PYTHON_ARCH: "64"
-      CONDA_PY: "27"
-      CONDA_INSTALL_LOCN: "C:\\Miniconda-x64"
     - PYTHON_VERSION: "3.5"
       PYTHON_ARCH: "64"
       CONDA_PY: "35"
@@ -26,11 +22,11 @@ install:
     # Use the pre-installed Miniconda for the desired arch
     - cmd: call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
     - cmd: conda update -y -q conda
-    - cmd: conda install -y -q -c defaults -c conda-forge -c cmutel numpy-base asteval astunparse stats_arrays pytest eight
+    - cmd: conda install -y -q -c defaults -c conda-forge -c cmutel numpy-base asteval astunparse stats_arrays pytest
     - cmd: cd
     - cmd: pip install -e .
 
 build: false
 
 test_script:
-  - "pytest"
+  - "pytest -v"

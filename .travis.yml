@@ -1,0 +1,62 @@
+# Using https://github.com/Anaconda-Platform/anaconda-project/blob/master/.travis.yml as example
+language: python
+
+matrix:
+  include:
+#    - python: "3.5"
+#      os: linux
+#      env: PYENV=3.5 VERSION=0.6.6.dev
+    - python: "3.6"
+      os: linux
+      env: PYENV=3.6 VERSION=0.6.6.dev
+    - python: "3.7"
+      os: linux
+      env: PYENV=3.7 VERSION=0.6.6.dev
+#    - python: "3.5"
+#      language: generic
+#      os: osx
+#      env: PYENV=3.5 VERSION=0.6.6.dev
+    - python: "3.6"
+      language: generic
+      os: osx
+      env: PYENV=3.6 VERSION=0.6.6.dev
+    - python: "3.7"
+      language: generic
+      os: osx
+      env: PYENV=3.7 VERSION=0.6.6.dev
+
+install:
+  # NOTE: Cannot use standalone executable for python 3.5 as the latest acceptable conda version
+  #  for that python version is 4.5.11, and the lowest executable version is 4.7.5 leading to a
+  #  CondaUpgradeError. (see https://travis-ci.com/dgdekoning/bw-parameters/jobs/270435141)
+  # As suggested by https://github.com/conda/conda/issues/9337#issuecomment-542466141
+  - wget https://repo.anaconda.com/pkgs/misc/conda-execs/conda-latest-$TRAVIS_OS_NAME-64.exe -O conda.exe
+  - chmod +x conda.exe
+  - export CONDA_ALWAYS_YES=1
+  # Pin version of coverage below 5.0 due to breaking changes: https://github.com/z4r/python-coveralls/issues/73
+  - ./conda.exe create -p $HOME/miniconda -c defaults -c conda-forge python=$PYENV conda conda-build pytest pytest-cov python-coveralls "coverage<5.0"
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  # Useful for debugging any issues with conda
+  - conda info -a
+
+  # Build source into local package for testing
+  - conda build ./ci/recipe --no-test
+  - conda install -q -c defaults -c conda-forge -c cmutel -c file://$HOME/miniconda/conda-bld/ bw-parameters-dev==$VERSION;
+
+script:
+  # Run tests on the installed package while also determining code coverage.
+  - py.test -v --cov=bw2parameters;
+
+after_success:
+  # Only upload the code coverage from linux py37 machine
+  - if [ "$TRAVIS_OS_NAME" == "linux" -a "$PYENV" == "3.7" ]; then coveralls; fi
+
+# Shouldn't need to have a lot of commit-history within the test
+git:
+  depth: 3
+
+notifications:
+  email:
+    on_success: always # default: change
+    on_failure: always # default: always
