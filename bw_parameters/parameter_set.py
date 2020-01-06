@@ -7,7 +7,7 @@ import numpy as np
 from stats_arrays import uncertainty_choices
 
 from .errors import *
-from .utils import get_symbols, EXISTING_SYMBOLS, isstr, isidentifier
+from .utils import get_symbols, EXISTING_SYMBOLS, isidentifier
 
 
 MC_ERROR_TEXT = """Formula returned array of wrong shape:
@@ -90,7 +90,7 @@ class ParameterSet(object):
             if not isinstance(value, dict):
                 raise ValueError("Parameter value {} is not a dictionary".format(key))
             elif not (isinstance(value.get("amount"), (Number, np.ndarray)) or
-                      isstr(value.get("formula"))):
+                      isinstance(value.get("formula"), str)):
                 raise ValueError(("Parameter {} must have either ``amount`` "
                                   "or ``formula`` field").format(key))
             elif not isidentifier(key):

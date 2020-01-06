@@ -3,13 +3,6 @@ import ast
 
 import asteval
 
-try:
-    # Python 2
-    string_type = basestring
-except NameError:
-    # Python 3
-    string_type = str
-
 
 def _get_existing_symbols():
     interpreter = asteval.Interpreter()
@@ -32,7 +25,7 @@ def isidentifier(ident):
     Stolen from http://stackoverflow.com/questions/12700893/how-to-check-if-a-string-is-a-valid-python-identifier-including-keyword-check
     """
 
-    if not isinstance(ident, string_type):
+    if not isinstance(ident, str):
         raise TypeError('expected str, but got {!r}'.format(type(ident)))
 
     # Resulting AST of simple identifier is <Module [<Expr <Name "foo">>]>
@@ -48,7 +41,3 @@ def isidentifier(ident):
         or root.body[0].value.id != ident):
         return False
     return True
-
-
-def isstr(s):
-    return isinstance(s, string_type)
